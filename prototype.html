@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!--FONT FAMILY: PUBLIC SANS-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100&display=swap" rel="stylesheet">
+
+    <!--PAGE TITLE-->
+    <title>A Mean Solar Day</title>
+
+    <!--LINK TO CSS STYLE SHEET-->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <!--EXTERNAL D3.JS V6 LIBRARY-->
+    <script type="text/javascript" src="https://d3js.org/d3.v6.js"></script>
+</head>
+
+<body>
+    <div id="logo">
+        <img src="img/logo.png" alt="logo">
+    </div>
+    <div id="navtable">
+        <ul>
+            <li><a href="index.html">ABOUT</a></li>
+            <li><a
+                    href="https://github.com/diedrebrown/Brown-INFO69702PIV-D3-Fa20/tree/master/Final_Project/Prototypes">PROTOTYPES</a>
+            </li>
+            <li><a href="prototype.html">FINAL PROTOTYPE</a></li>
+        </ul>
+    </div>
+    <div id="pgtitle">
+        <!--PAGE TITLE-->
+        <h1>Final Prototype</h1>
+    </div>
+    <div id="diagrams">
+        <h2>How to Read the Radial Charts</h2>
+        <p>These diagrams are a key to reading the chart for time, light value readings, and activity. Use your mouse to
+            see the light value readings and use the slider to see specific activity within the day.</p>
+        <p><a title="chartdiagrams"><img width="296" src="chartdiagram.png" alt="chart diagrams"></a></p>
+    </div>
+    <div>
+        <h2>A Note on the <a href="data/light_activity_readings.csv">Data:</a></h2>
+        <p> In OpenRefine, I noticed that though there were multiple sensor readings for each minute <a
+                href="data/adafruit_readings.csv"> (6527
+                readings in total)</a>, the sensor did not
+            record the seconds. As my logs of my activities were notated in hour blocks. After reviewing the original
+            readings and seeing that the readings did not vary much from minute to minute, I decided to average the
+            readings for every half hour.</p>
+    </div>
+    <!--CUSTOM JS-->
+    <script src="js/main.js"></script>
+
+
+    <div id="footer">
+        <!--FOOTER-->
+        © Diedre Brown, 2020
+    </div>
+</body>
+
+</html>

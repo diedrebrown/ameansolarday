@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!--FONT FAMILY: PUBLIC SANS-->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100&display=swap" rel="stylesheet">
+
+    <!--PAGE TITLE-->
+    <title>A Mean Solar Day</title>
+
+    <!--LINK TO CSS STYLE SHEET-->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <!--EXTERNAL D3.JS V6 LIBRARY-->
+    <script type="text/javascript" src="https://d3js.org/d3.v6.js"></script>
+</head>
+
+<body>
+    <div id="logo">
+        <img src="img/logo.png" alt="logo">
+    </div>
+    <div id="navtable">
+        <ul>
+            <li><a href="index.html">ABOUT</a></li>
+            <li><a
+                    href="https://github.com/diedrebrown/Brown-INFO69702PIV-D3-Fa20/tree/master/Final_Project/Prototypes">PROTOTYPES</a>
+            </li>
+            <li><a href="prototype.html">FINAL PROTOTYPE</a></li>
+        </ul>
+    </div>
+    <section id="aboutpjt">
+        <P>
+            <i>Time-series data</i> is most commonly represented as a linear chart, where the quality of a line and
+            selection of color encodes information about the time period in question. The mark of a line is a highly
+            effective method of representing time-series information because it averages the shortest distance between
+            two moments in time. Yet, is it an accurate representation of how one experiences time? What would a day
+            look like if visualized differently? Would this visualization still express the same information as a linear
+            time-series chart?
+        </P>
+        <p>
+            <strong>A Mean Solar Day</strong> is an exploration into the visualization of time-series data on the
+            quantified self. Using daylight data obtained from
+            an Adafruit Feather Huzzah ESP8266 microcontroller with a photoresistor light sensor module, and a personal
+            record of my activities over the same day, 17 September 2020, this prototype aims to determine if an
+            alteration in the visualization of time-series data can provide greater insights into how the quantity of
+            daylight experienced in my affected my
+            behavior patterns for that day.
+        </p>
+        <h2><a href="data/light_activity_readings.csv">The Data</a></h2>
+        <P>
+            As the Adafruit Feather is an internet enabled device, the daylight sensor readings were collected via a
+            webhook, IFTTT, and sent to Google Sheet for recording. As sensor readings are taken approximately every
+            three (3) seconds, a day's recording is approximately four (4) Google Sheets long. These data were combined
+            in OpenRefine. There I noticed that though there were multiple sensor readings for each minute <a
+                href="data/adafruit_readings.csv"> (6527
+                readings in total)</a>, the sensor did not
+            record the seconds. As my logs of my activities were notated in hour blocks. After reviewing the original
+            readings and
+            seeing that the readings did not vary much from minute to minute, I decided to average the readings for
+            every half hour.
+        </P>
+    </section>
+    <section>
+        <!--Custom JS-->
+        <!--<script src="js/main.js"></script>-->
+        <h1>Standard Time-Series Representations of the Data</h1>
+        <h2>Measured Daylight Readings 17 September 2020</h2>
+        <p>The photocell is calibrated to read daylight levels between 0 and 1024. Readings closer to zero (0) are
+            higher in light intensity; whereas, readings closer to 1024 are reduced light intensity and/or darkness.
+        </p>
+        <div>
+            <svg id="sttsline"></svg>
+        </div>
+
+    </section>
+
+    <script type="text/javascript">
+        /******STANDARD LINE CHART*********/
+        // create shape constants
+        const width = 550,
+            height = 550,
+            padding = 20;
+
+        // create svg line element
+        const svgline = d3.select('#sttsline');
+        svgline.append("svg")
+            .attr('width', width)
+            .attr('height', height)
+            .append('g')
+            .attr('transform', 'translate(' + padding + ',' + padding + ')');
+
+        // create a time parser for x-scale
+        const parseTime = d3.timeParse("%H:%M:%S");
+
+        // create tooltip
+        const tooltip = d3.select("body")
+            .append("div")
+            .attr("id", "tooltip")
+            .style("opacity", 0);
+
+        //create line scales
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
+
+        // create line axis generators
+        const bottomAxis = d3.axisBottom()
+            .scale(x)
+            .ticks(12);
+        const leftAxis = d3.axisLeft()
+            .scale(y)
+            .tickValues([0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200]);
+
+        // create line axis groups
+        const xAxis = svgline.append("g")
+            .attr("class", "x-axis");
+        //.attr("transform", 'translate(0, ${height}');
+        const yAxis = svgline.append("g")
+            .attr("class", "y-axis");
+
+        // line y-axis label
+        yAxis.append("text")
+            .attr("class", "axis-title")
+            .attr("transform", "rotate(-90)")
+            .attr("dy", ".9em")
+            .style("text-anchor", "end")
+            .text("Average Light Value");
+        // line x-axis label
+        xAxis.append("text")
+            .attr("class", "axis-title")
+            .attr("dx", ".75em")
+            .style("text-anchor", "end")
+            .text("Time");
+
+
+        // import data for line chart
+        const dataset = d3.csv("data/light_activity_readings.csv").then(data => {
+            // parse the data
+            data.forEach(d => {
+                d.time = parseTime(d.time);
+                d.lightavg = +d.lightavg;
+                d.sleep = +d.sleep;
+                d.work = +d.work;
+                d.walk = +d.walk;
+            });
+
+            // set scales
+            x.domain(d3.extent(data, d => d.time));
+            y.domain([d3.min(data, d => d.lightavg), d3.max(data, d => d.lightavg)]);
+
+            // line generator
+            const line = d3.line()
+                .x(d => x(d.time))
+                .y(d => y(d.lightavg));
+
+            // add line to chart
+            svgline.append("path")
+                .data([data])
+                .attr("class", "line")
+                .attr("fill", "none")
+                .attr("stroke", "grey")
+                .attr("stroke-width", "1.25px")
+                .attr("d", line(data))
+                // mouseover
+                .on("mouseover", (event, d) => {
+                    d3.select("#tooltip")
+                        .transition()
+                        .duration(500)
+                        .style("opacity", 1)
+                        .style("right", (event.pageX + 2) + "px")
+                        .style("top", (event.pageY + 2) + "px")
+                        .text("Mean Light Value: " + d.lightavg);
+                })
+                .on("mouseout", (event, d) => {
+                    d3.select("#tooltip")
+                        .transition()
+                        .style("opacity", 0);
+                })
+                .on("mousemove", (event, d) => {
+                    d3.select("#tooltip")
+                        .style("right", (event.pageX + 2) + "px")
+                        .style("top", (event.pageY + 2) + "px")
+                });
+
+            // implement bottom and left line axes
+            svgline.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(0," + (height) + ")")
+                .call(bottomAxis);
+
+            svgline.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(" + (width) + ",0)")
+                .call(leftAxis);
+        });
+
+    </script>
+    <div id="footer">
+        <!--FOOTER-->
+        © Diedre Brown, 2020
+    </div>
+</body>
+
+</html>
