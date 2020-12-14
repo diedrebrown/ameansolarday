@@ -38,7 +38,7 @@
         <h2>How to Read the Radial Charts</h2>
         <p>These diagrams are a key to reading the chart for time, light value readings, and activity. Use your mouse to
             see the light value readings and use the slider to see specific activity within the day.</p>
-        <p><a title="chartdiagrams"><img width="296" src="chartdiagram.png" alt="chart diagrams"></a></p>
+        <p><a title="chartdiagrams"><img width="296" src="img/chartdiagram.png" alt="chart diagrams"></a></p>
     </div>
     <div>
         <h2>A Note on the <a href="data/light_activity_readings.csv">Data:</a></h2>
@@ -49,8 +49,72 @@
             readings and seeing that the readings did not vary much from minute to minute, I decided to average the
             readings for every half hour.</p>
     </div>
+    <div>
+        <h1>A Mean Solar Day</h1>
+        <svg></svg>
+    </div>
     <!--CUSTOM JS-->
-    <script src="js/main.js"></script>
+    <script>
+        //based on a M.Bostock radial graph
+        const dataset = d3.csv("data/activities.csv").then(data => {
+
+            //declare consts
+            const margin = { top: 10, right: 10, bottom: 10, left: 10 }
+            const w = 660 - margin.left - margin.right;
+            const h = 660 - margin.top - margin.bottom;
+
+            //select svg element
+            const svg = d3.select("svg");
+            svg.append("svg")
+                .attr("width", w + margin.left + margin.right)
+                .attr("height", h + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + w / 2 + "," + (h / 2 + 100) + ")");
+
+
+            //declare radii
+            const outerRadius = Math.min(w, h) / 2;
+            const innerRadius = 100;
+
+            //declare scales
+            const x = d3.scaleBand()
+                .domain(data.map(d => d.time))
+                .range([0, 2 * Math.PI])
+                .align(0);
+            const y = d3.scaleRadial()
+                .domain([0, 1])
+                .range([innerRadius, outerRadius])
+            const color = d3.scaleOrdinal()
+                .domain(data.columns.slice(1))
+                .range(["#5f5da8", "#ee599f", "#3d7454"]);
+
+            //create arcs to follow
+            const arcs = d3.arc()
+                .innerRadius(d => y(d[0]))
+                .outerRadius(d => y(d[1]))
+                .startAngle(d => x(d.data.time))
+                .endAngle(d => x(d.data.time) + x.bandwidth())
+                .padAngle(0.01)
+                .padRadius(innerRadius);
+
+            //call and append groups to arc
+            svg.append("g")
+                .selectAll("g")
+                // make stacked bars
+                .data(d3.stack().keys(data.columns.slice(1))(data))
+                .join("g")
+                .attr("fill", d => color(d.key))
+                .selectAll("path")
+                .data(d => d)
+                .join("path")
+                .attr("d", d3.arc());
+
+        });
+
+
+
+
+    </script>
 
 
     <div id="footer">

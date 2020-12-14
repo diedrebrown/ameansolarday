@@ -40,7 +40,7 @@
             time-series chart?
         </P>
         <p>
-            <strong>A Mean Solar Day</strong> is an exploration into the visualization of time-series data on the
+            <strong>A Mean Solar Day</strong> is an experiment with the visualization of time-series data on the
             quantified self. Using daylight data obtained from
             an Adafruit Feather Huzzah ESP8266 microcontroller with a photoresistor light sensor module, and a personal
             record of my activities over the same day, 17 September 2020, this prototype aims to determine if an
@@ -65,7 +65,7 @@
     <section>
         <!--Custom JS-->
         <!--<script src="js/main.js"></script>-->
-        <h1>Standard Time-Series Representations of the Data</h1>
+        <h1>Standard Time-Series Representation of the Data</h1>
         <h2>Measured Daylight Readings 17 September 2020</h2>
         <p>The photocell is calibrated to read daylight levels between 0 and 1024. Readings closer to zero (0) are
             higher in light intensity; whereas, readings closer to 1024 are reduced light intensity and/or darkness.
@@ -110,7 +110,7 @@
             .ticks(12);
         const leftAxis = d3.axisLeft()
             .scale(y)
-            .tickValues([0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200]);
+            .tickValues([0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100]);
 
         // create line axis groups
         const xAxis = svgline.append("g")
